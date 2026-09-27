@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import AboutPage from './components/AboutPage';
+import LocalDataImport from './components/LocalDataImport';
 import LocalListingsPanel from './components/LocalListingsPanel';
 const MarketTrends = lazy(() => import('./components/MarketTrends'));
 const ListingDetail = lazy(() => import('./components/ListingDetail'));
@@ -10,7 +11,7 @@ import MyConditionsForm from './components/MyConditionsForm';
 import valuationJson from './config/valuation.json';
 import { fetchJson, loadSiteData, loadTransactionsForCodes } from './lib/data';
 import { labelText, localIsoDate } from './lib/format';
-import { loadLocalData, readStarred, saveStarred, toMyListing, type LocalData } from './lib/localListings';
+import { deleteStoredBundle, downloadBundle, loadLocalData, readStarred, readStoredBundle, saveStarred, toMyListing, type LocalData } from './lib/localListings';
 import { makeTimeAdjuster } from './lib/regionIndex';
 import { useEvaluations } from './lib/useEvaluations';
 import { useListings } from './lib/useListings';
@@ -20,7 +21,7 @@ type Tab = 'map' | 'local' | 'trends' | 'listings' | 'conditions' | 'about';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'map', label: '地図' },
-  { id: 'local', label: '掲載物件（手元）' },
+  { id: 'local', label: '掲載物件' },
   { id: 'trends', label: '地域の動き' },
   { id: 'listings', label: '自分の物件' },
   { id: 'conditions', label: '自分の条件' },
@@ -49,6 +50,7 @@ export default function App() {
   const [activeLocalId, setActiveLocalId] = useState<string | null>(null);
   const [starred, setStarred] = useState<Set<string>>(() => readStarred());
   const [addedMessage, setAddedMessage] = useState('');
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     loadSiteData().then((data) => {
@@ -61,7 +63,8 @@ export default function App() {
     }).catch((error: unknown) => {
       setLoadError(error instanceof Error ? error.message : 'データを読み込めませんでした');
     });
-    void loadLocalData().then(setLocalData);
+    // 手元のサーバーのデータがなければ、以前読み込んだ共有ファイル（このブラウザに保存）を使う
+    void loadLocalData().then(async (data) => setLocalData(data ?? await readStoredBundle()));
   }, []);
 
   const toggleStar = useCallback((id: string) => {
@@ -205,7 +208,7 @@ export default function App() {
       <header className="site-header">
         <h1>京阪間 中古マンション相場マップ</h1>
         <nav aria-label="メインメニュー" className="tab-nav">
-          {TABS.filter((item) => (item.id !== 'local' || localData) && (item.id !== 'trends' || regionIndex)).map((item) => (
+          {TABS.filter((item) => item.id !== 'trends' || regionIndex).map((item) => (
             <button key={item.id} type="button" aria-current={tab === item.id ? 'page' : undefined} onClick={() => setTabAndClose(item.id)}>
               {item.label}
             </button>
@@ -272,7 +275,13 @@ export default function App() {
             {contractDataEmpty ? <p className="data-empty-note">成約事例データは未取得のため、相場の判定は保留です。</p> : null}
           </section>
         )) : null}
-        {tab === 'local' && localData ? (activeLocal ? (
+        {tab === 'local' && (!localData || importing) ? (
+          <LocalDataImport
+            onLoaded={(data) => { setLocalData(data); setImporting(false); setActiveLocalId(null); }}
+            onCancel={localData ? () => setImporting(false) : undefined}
+          />
+        ) : null}
+        {tab === 'local' && localData && !importing ? (activeLocal ? (
           <Suspense fallback={<section className="content-section"><p>物件詳細を読み込み中です。</p></section>}><ListingDetail
             listing={activeLocal}
             municipalities={municipalities}
@@ -295,7 +304,7 @@ export default function App() {
               <p className="form-note">
                 {activeLocal.sourceName}の掲載情報（初回 {activeLocal.firstSeen}・最終確認 {activeLocal.lastSeen}{activeLocal.status === 'removed' ? '・掲載終了' : ''}）。
                 位置: {activeLocal.locationPrecision === 'exact' ? '掲載ページの地図' : activeLocal.locationPrecision === 'approx' ? '住所から推定したおおよその位置' : '不明'}。
-                {activeLocal.detailFetchedAt ? `詳細は ${activeLocal.detailFetchedAt} に取得。` : '詳細（管理費・修繕積立金・階・リフォームなど）は未取得。星を付けて一覧の「詳細取得コマンドをコピー」から取得できます。'}
+                {activeLocal.detailFetchedAt ? `詳細は ${activeLocal.detailFetchedAt} に取得。` : localData?.origin === 'file' ? '詳細（管理費・修繕積立金・階・リフォームなど）は未取得です。' : '詳細（管理費・修繕積立金・階・リフォームなど）は未取得。星を付けて一覧の「詳細取得コマンドをコピー」から取得できます。'}
                 {activeLocal.landRights ? ` 土地の権利: ${activeLocal.landRights}。` : ''}{activeLocal.totalUnits ? ` 総戸数: ${activeLocal.totalUnits}戸。` : ''}{activeLocal.direction ? ` 向き: ${activeLocal.direction}。` : ''}
               </p>
             </>}
@@ -311,6 +320,12 @@ export default function App() {
             onToggleStar={toggleStar}
             onOpen={(listing) => openLocal(listing.id)}
             today={localIsoDate()}
+            onExport={localData.origin === 'server' ? () => downloadBundle(localData) : undefined}
+            onReplace={localData.origin === 'file' ? () => setImporting(true) : undefined}
+            onClear={localData.origin === 'file' ? () => {
+              if (!window.confirm('読み込んだ物件データを、このブラウザから消しますか？')) return;
+              void deleteStoredBundle().then(() => { setLocalData(null); setActiveLocalId(null); });
+            } : undefined}
           />
         )) : null}
         {tab === 'trends' && regionIndex ? (

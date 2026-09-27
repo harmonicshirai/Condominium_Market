@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import valuationJson from '../config/valuation.json';
 import type { LocalListing, MyConditions, ValuationConfig } from '../types';
 import { buildChecklist } from './checklist';
-import { detailCommand, loadLocalData, matchesConditions, toMyListing } from './localListings';
+import { createBundle, detailCommand, loadLocalData, matchesConditions, parseBundle, toMyListing } from './localListings';
 import { DEFAULT_CONDITIONS } from './storage';
 
 const config = valuationJson as ValuationConfig;
@@ -86,5 +86,20 @@ describe('checklist for local listings', () => {
   it('does not show land rights for my own listings', () => {
     const items = buildChecklist({ listing: makeLocal(), evaluation: null, hazard: null, conditions: DEFAULT_CONDITIONS, config });
     expect(items.some((item) => item.id === 'land_rights')).toBe(false);
+  });
+});
+
+describe('share bundle', () => {
+  it('round-trips through the share file', () => {
+    const text = createBundle({ meta: META, listings: [makeLocal()], dropped: 0 }, new Date('2026-09-28T00:00:00Z'));
+    const data = parseBundle(text);
+    expect(data.origin).toBe('file');
+    expect(data.listings[0].name).toBe('サンプルマンション');
+    expect(data.meta.counts.active).toBe(1);
+  });
+  it('rejects files that are not share files', () => {
+    expect(() => parseBundle('not json')).toThrow('JSON');
+    expect(() => parseBundle(JSON.stringify({ schema: 'other', version: 1 }))).toThrow('共有用ファイル');
+    expect(() => parseBundle(JSON.stringify({ schema: 'keihan-mansion-map/local-data', version: 1, meta: META, listings: [] }))).toThrow('物件がありません');
   });
 });

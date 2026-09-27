@@ -15,13 +15,18 @@ interface LocalListingsPanelProps {
   onToggleStar: (id: string) => void;
   onOpen: (listing: LocalListing) => void;
   today: string;
+  /** 手元のサーバーのデータなら共有用ファイルを書き出せる */
+  onExport?: () => void;
+  /** 共有ファイルから読み込んだデータなら、読み直し・削除のボタンを出す */
+  onReplace?: () => void;
+  onClear?: () => void;
 }
 
 type SortKey = 'gap' | 'price' | 'ppsqm' | 'area' | 'built' | 'walk' | 'days';
 const PAGE_SIZE = 50;
 const CONFIDENCE_ORDER: Confidence[] = ['A', 'B', 'C', 'D'];
 
-export default function LocalListingsPanel({ data, evaluations, evaluationsLoading, municipalities, conditions, starred, onToggleStar, onOpen, today }: LocalListingsPanelProps) {
+export default function LocalListingsPanel({ data, evaluations, evaluationsLoading, municipalities, conditions, starred, onToggleStar, onOpen, today, onExport, onReplace, onClear }: LocalListingsPanelProps) {
   const [municipalityCode, setMunicipalityCode] = useState('');
   const [label, setLabel] = useState('');
   const [minConfidence, setMinConfidence] = useState<Confidence>('C');
@@ -119,13 +124,22 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
   return (
     <section className="content-section">
       <div className="section-heading section-heading--content">
-        <h2>掲載物件（手元）</h2>
+        <h2>掲載物件</h2>
         <span className="count-note">{data.meta.sourceName}・一覧取得 {data.meta.lastListRunAt ? new Date(data.meta.lastListRunAt).toLocaleString('ja-JP') : '不明'}</span>
       </div>
       <p className="form-note">
         掲載中 {counts.active}件・掲載終了 {counts.removed}件・詳細取得済み {counts.withDetail}件・正確な位置 {counts.exact}件・おおよその位置 {counts.approx}件。
-        このデータはこのパソコンの中だけにあり、公開サイトには含まれません。{data.dropped ? `読み取れなかった物件が ${data.dropped}件あります。` : ''}
+        {data.origin === 'file'
+          ? '共有ファイルから読み込んだデータです。このブラウザの中にだけ保存していて、サイトには送っていません。'
+          : 'このデータはこのパソコンの中だけにあり、公開サイトには含まれません。'}
+        {data.dropped ? `読み取れなかった物件が ${data.dropped}件あります。` : ''}
       </p>
+      <div className="check-row">
+        {onExport ? <button type="button" className="button button--quiet" onClick={onExport}>共有用ファイルを書き出す</button> : null}
+        {onReplace ? <button type="button" className="button button--quiet" onClick={onReplace}>別のファイルを読み込む</button> : null}
+        {onClear ? <button type="button" className="button button--quiet" onClick={onClear}>このブラウザから消す</button> : null}
+      </div>
+      {onExport ? <p className="form-note">書き出したファイルを家族などに送ると、公開サイトの「掲載物件」タブで読み込んで同じように見られます。</p> : null}
       {evaluationsLoading ? <p className="data-empty-note" role="status">相場との比較を計算しています。</p> : null}
       <div className="filter-row" aria-label="掲載物件を絞り込む">
         <label>市区町村<select value={municipalityCode} onChange={(event) => { setMunicipalityCode(event.target.value); setPage(0); }}><option value="">すべて</option>{[...new Set(data.listings.map((item) => item.municipalityCode))].map((code) => <option key={code} value={code}>{municipalityName(code)}</option>)}</select></label>
@@ -142,7 +156,7 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
         <label><input type="checkbox" checked={onlyMine} onChange={(event) => { setOnlyMine(event.target.checked); setPage(0); }} />自分の条件に合うものだけ</label>
         <label><input type="checkbox" checked={dedupe} onChange={(event) => { setDedupe(event.target.checked); setPage(0); }} />重複候補は最安の1件だけ</label>
         <label><input type="checkbox" checked={onlyStarred} onChange={(event) => { setOnlyStarred(event.target.checked); setPage(0); }} />星付きだけ</label>
-        <button type="button" className="button button--quiet" disabled={!command} onClick={() => void copyCommand()}>詳細取得コマンドをコピー</button>
+        {data.origin !== 'file' ? <button type="button" className="button button--quiet" disabled={!command} onClick={() => void copyCommand()}>詳細取得コマンドをコピー</button> : null}
       </div>
       {copied ? <p className="form-note" role="status">{copied}</p> : null}
       <p className="count-note">{rows.length}件（判定が保留の物件は、相場比の並べ替えで後ろに回ります）</p>

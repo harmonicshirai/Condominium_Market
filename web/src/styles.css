@@ -227,3 +227,7 @@ main { flex: 1; }
 .quadrant { position: relative; }
 .quadrant__legend { margin: 0 0 0.4rem; color: var(--color-muted); font-size: 0.78rem; }
 .chart-tooltip { display: grid; gap: 0.2rem; max-width: 20rem; padding: 0.55rem 0.7rem; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-surface); color: var(--color-text); font-size: 0.78rem; }
+
+/* 共有用ファイルの読み込み */
+.import-card p { line-height: 1.7; }
+.import-steps { margin: 0 0 0.8rem; padding-left: 1.3rem; line-height: 1.8; }
