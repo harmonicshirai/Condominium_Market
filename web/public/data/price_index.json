@@ -1,0 +1,133 @@
+{
+  "method": "time_dummy_hedonic",
+  "basePeriod": "2026Q1",
+  "points": [
+    {
+      "period": "2021Q1",
+      "value": 0.7104542740037516,
+      "n": 1162,
+      "lowN": false
+    },
+    {
+      "period": "2021Q2",
+      "value": 0.7199985800461136,
+      "n": 1421,
+      "lowN": false
+    },
+    {
+      "period": "2021Q3",
+      "value": 0.7251281336032418,
+      "n": 1245,
+      "lowN": false
+    },
+    {
+      "period": "2021Q4",
+      "value": 0.7436293406062571,
+      "n": 1530,
+      "lowN": false
+    },
+    {
+      "period": "2022Q1",
+      "value": 0.772186167877566,
+      "n": 1490,
+      "lowN": false
+    },
+    {
+      "period": "2022Q2",
+      "value": 0.7706713720825872,
+      "n": 1508,
+      "lowN": false
+    },
+    {
+      "period": "2022Q3",
+      "value": 0.7882679819495902,
+      "n": 1274,
+      "lowN": false
+    },
+    {
+      "period": "2022Q4",
+      "value": 0.786730376739205,
+      "n": 1411,
+      "lowN": false
+    },
+    {
+      "period": "2023Q1",
+      "value": 0.8163912526290017,
+      "n": 1425,
+      "lowN": false
+    },
+    {
+      "period": "2023Q2",
+      "value": 0.822325225697587,
+      "n": 1338,
+      "lowN": false
+    },
+    {
+      "period": "2023Q3",
+      "value": 0.8299688358866436,
+      "n": 1371,
+      "lowN": false
+    },
+    {
+      "period": "2023Q4",
+      "value": 0.8396238016767749,
+      "n": 1496,
+      "lowN": false
+    },
+    {
+      "period": "2024Q1",
+      "value": 0.854086404456399,
+      "n": 1551,
+      "lowN": false
+    },
+    {
+      "period": "2024Q2",
+      "value": 0.8802897912997418,
+      "n": 1542,
+      "lowN": false
+    },
+    {
+      "period": "2024Q3",
+      "value": 0.8912532752794464,
+      "n": 1485,
+      "lowN": false
+    },
+    {
+      "period": "2024Q4",
+      "value": 0.897949372154772,
+      "n": 1595,
+      "lowN": false
+    },
+    {
+      "period": "2025Q1",
+      "value": 0.9221451849529024,
+      "n": 1931,
+      "lowN": false
+    },
+    {
+      "period": "2025Q2",
+      "value": 0.926428930401882,
+      "n": 1862,
+      "lowN": false
+    },
+    {
+      "period": "2025Q3",
+      "value": 0.9459443934508547,
+      "n": 1698,
+      "lowN": false
+    },
+    {
+      "period": "2025Q4",
+      "value": 0.9556130107528412,
+      "n": 1793,
+      "lowN": false
+    },
+    {
+      "period": "2026Q1",
+      "value": 1.0,
+      "n": 1865,
+      "lowN": false
+    }
+  ],
+  "generatedAt": "2026-09-27T13:07:20.399517+00:00"
+}

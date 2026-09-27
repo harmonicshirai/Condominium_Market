@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-09-27T13:21:55.749334+00:00",
+  "periodFrom": "2021Q1",
+  "periodTo": "2026Q1",
+  "transactionCount": 55889,
+  "hasStations": true,
+  "hasHazard": true,
+  "sources": [
+    {
+      "id": "reinfolib_api",
+      "name": "国土交通省 不動産情報ライブラリ（API）",
+      "url": "https://www.reinfolib.mlit.go.jp/",
+      "credit": "このサービスは、国土交通省の不動産情報ライブラリのAPI機能を使用していますが、提供情報の最新性、正確性、完全性等が保証されたものではありません",
+      "usage": "API利用規約 第7条で表示が必要なクレジット"
+    },
+    {
+      "id": "reinfolib_prices",
+      "name": "不動産価格（取引価格・成約価格）情報",
+      "url": "https://www.reinfolib.mlit.go.jp/realEstatePrices/",
+      "credit": "出典：国土交通省 不動産情報ライブラリ「不動産価格（取引価格・成約価格）情報」を加工して作成",
+      "usage": "中古マンションの比較事例・価格指数・駅別相場"
+    },
+    {
+      "id": "disaportal",
+      "name": "ハザードマップポータルサイト",
+      "url": "https://disaportal.gsi.go.jp/hazardmap/copyright/opendata.html",
+      "credit": "出典：「ハザードマップポータルサイト」",
+      "usage": "地図に重ねる洪水・内水・高潮・津波・土砂災害のタイル（加工なし）"
+    },
+    {
+      "id": "gsi_tiles",
+      "name": "地理院タイル",
+      "url": "https://maps.gsi.go.jp/development/ichiran.html",
+      "credit": "地理院タイル",
+      "usage": "背景地図"
+    },
+    {
+      "id": "ksj_stations",
+      "name": "国土数値情報（駅別乗降客数データ）",
+      "url": "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-S12-2023.html",
+      "credit": "「国土数値情報（駅別乗降客数データ）」（国土交通省）（https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-S12-2023.html）を加工して作成",
+      "usage": "駅の位置と乗降客数（不動産情報ライブラリ API 経由）"
+    },
+    {
+      "id": "disaportal_hazard",
+      "name": "ハザードマップポータルサイト（洪水・高潮・津波の浸水想定区域）",
+      "url": "https://disaportal.gsi.go.jp/hazardmapportal/hazardmap/copyright/copyright_data.html",
+      "credit": "「ハザードマップポータルサイト」（https://disaportal.gsi.go.jp/hazardmapportal/hazardmap/copyright/copyright_data.html）を加工して作成",
+      "usage": "地点判定用の格子（不動産情報ライブラリ API 経由。津波は一部非商用のデータを含む）"
+    },
+    {
+      "id": "ksj_landslide",
+      "name": "国土数値情報（土砂災害警戒区域データ）",
+      "url": "https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-A33-2024.html",
+      "credit": "「国土数値情報（土砂災害警戒区域データ）」（国土交通省）（https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-A33-2024.html）を加工して作成",
+      "usage": "地点判定用の格子（不動産情報ライブラリ API 経由。一部非商用のデータを含む）"
+    }
+  ]
+}

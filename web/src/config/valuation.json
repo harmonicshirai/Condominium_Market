@@ -1,0 +1,36 @@
+{
+  "priceCategory": "contract",
+  "minComparables": 10,
+  "holdBelow": 5,
+  "base": {
+    "walkMinutesDiff": 5,
+    "periodQuarters": 8,
+    "ageYears": 7,
+    "areaRatio": 0.25,
+    "scope": "municipality",
+    "includeTrade": false
+  },
+  "relaxSteps": [
+    { "label": "駅徒歩の条件を外した", "walkMinutesDiff": null },
+    { "label": "取引時期を直近12四半期に広げた", "periodQuarters": 12 },
+    { "label": "築年数の幅を±10年に広げた", "ageYears": 10 },
+    { "label": "面積の幅を±35%に広げた", "areaRatio": 0.35 },
+    { "label": "同じグループの市区町村まで広げた", "scope": "group" },
+    { "label": "取引価格情報（アンケート由来）も含めた", "includeTrade": true }
+  ],
+  "seismicMustMatch": true,
+  "renovationPreferenceMin": 10,
+  "labelThresholdPct": 5,
+  "confidence": {
+    "A": { "minN": 30, "maxIqrRatio": 0.25 },
+    "B": { "minN": 15, "maxIqrRatio": 0.35 },
+    "C": { "minN": 5 }
+  },
+  "staleQuarters": 4,
+  "checklist": {
+    "areaOkSqm": 55,
+    "areaWarnSqm": 50,
+    "repairReserveGuidelineYenPerSqm": null,
+    "repairReserveWarnRatio": 0.7
+  }
+}

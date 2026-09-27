@@ -1,0 +1,68 @@
+{
+  "confirmedAt": "2026-09-27",
+  "floodDepthRank": {
+    "source": "https://nlftp.mlit.go.jp/ksj/gml/codelist/water_depth_code.xlsx",
+    "codes": {
+      "1": {
+        "label": "0～0.5m未満（一般的な住宅において床下程度の浸水）",
+        "minM": 0.0,
+        "maxM": 0.5
+      },
+      "2": {
+        "label": "0.5～3.0m未満（床上から1階が浸水）",
+        "minM": 0.5,
+        "maxM": 3.0
+      },
+      "3": {
+        "label": "3.0～5.0m未満（2階部分が浸水）",
+        "minM": 3.0,
+        "maxM": 5.0
+      },
+      "4": {
+        "label": "5.0～10.0m未満（2階部分が水没）",
+        "minM": 5.0,
+        "maxM": 10.0
+      },
+      "5": {
+        "label": "10.0～20.0m未満（津波基準水位を表現する）",
+        "minM": 10.0,
+        "maxM": 20.0
+      },
+      "6": {
+        "label": "20.0m以上",
+        "minM": 20.0,
+        "maxM": null
+      }
+    }
+  },
+  "landslideType": {
+    "source": "https://nlftp.mlit.go.jp/ksj/gml/codelist/CodeOfPhenomenon.html",
+    "codes": {
+      "1": "急傾斜地の崩壊",
+      "2": "土石流",
+      "3": "地滑り"
+    }
+  },
+  "landslideZone": {
+    "source": "https://nlftp.mlit.go.jp/ksj/gml/codelist/CodeOfZone_A33.html",
+    "codes": {
+      "1": {
+        "label": "土砂災害警戒区域（指定済）",
+        "special": false
+      },
+      "2": {
+        "label": "土砂災害特別警戒区域（指定済）",
+        "special": true
+      },
+      "3": {
+        "label": "土砂災害警戒区域（指定前）",
+        "special": false
+      },
+      "4": {
+        "label": "土砂災害特別警戒区域（指定前）",
+        "special": true
+      }
+    }
+  },
+  "note": "高潮（A49_003）と津波（A40_003）は浸水深の区分が文字列で返るため、コード表ではなく文字列から範囲を求める"
+}

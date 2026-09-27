@@ -1,0 +1,21 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+/data/
+/private/
+node_modules/
+web/dist/
+web/public/local-data/
+*.listings.json
+output/
+.claude/
+/*.csv
+
+# 計画資料・エージェント向けの指示は手元だけに置く（公開しない）
+AGENTS.md
+LUNA_TASKS.md
+KYOTO_OSAKA_IMPLEMENTATION_PLAN.md
+DATA_SOURCE_RESEARCH.md
+kansai_realestate_market_tool_requirements.md

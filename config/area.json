@@ -1,0 +1,202 @@
+{
+  "prefectures": {
+    "26": "京都府",
+    "27": "大阪府",
+    "28": "兵庫県"
+  },
+  "groups": {
+    "kyoto_center": "京都市中心部",
+    "kyoto_southwest": "京都市南西部",
+    "fushimi_yawata": "伏見・八幡",
+    "otokuni": "乙訓",
+    "hokusetsu": "北摂東部",
+    "keihan_osaka": "京阪沿線（大阪府）",
+    "osaka_north": "大阪市北東部",
+    "osaka_center": "大阪市中心部",
+    "hanshin": "阪神間"
+  },
+  "municipalities": [
+    {
+      "code": "26104",
+      "name": "京都市中京区",
+      "group": "kyoto_center"
+    },
+    {
+      "code": "26105",
+      "name": "京都市東山区",
+      "group": "kyoto_center"
+    },
+    {
+      "code": "26106",
+      "name": "京都市下京区",
+      "group": "kyoto_center"
+    },
+    {
+      "code": "26107",
+      "name": "京都市南区",
+      "group": "kyoto_southwest"
+    },
+    {
+      "code": "26108",
+      "name": "京都市右京区",
+      "group": "kyoto_southwest"
+    },
+    {
+      "code": "26111",
+      "name": "京都市西京区",
+      "group": "kyoto_southwest"
+    },
+    {
+      "code": "26109",
+      "name": "京都市伏見区",
+      "group": "fushimi_yawata"
+    },
+    {
+      "code": "26210",
+      "name": "八幡市",
+      "group": "fushimi_yawata"
+    },
+    {
+      "code": "26208",
+      "name": "向日市",
+      "group": "otokuni"
+    },
+    {
+      "code": "26209",
+      "name": "長岡京市",
+      "group": "otokuni"
+    },
+    {
+      "code": "26303",
+      "name": "大山崎町",
+      "group": "otokuni"
+    },
+    {
+      "code": "27301",
+      "name": "島本町",
+      "group": "hokusetsu"
+    },
+    {
+      "code": "27207",
+      "name": "高槻市",
+      "group": "hokusetsu"
+    },
+    {
+      "code": "27211",
+      "name": "茨木市",
+      "group": "hokusetsu"
+    },
+    {
+      "code": "27224",
+      "name": "摂津市",
+      "group": "hokusetsu"
+    },
+    {
+      "code": "27205",
+      "name": "吹田市",
+      "group": "hokusetsu"
+    },
+    {
+      "code": "27210",
+      "name": "枚方市",
+      "group": "keihan_osaka"
+    },
+    {
+      "code": "27215",
+      "name": "寝屋川市",
+      "group": "keihan_osaka"
+    },
+    {
+      "code": "27223",
+      "name": "門真市",
+      "group": "keihan_osaka"
+    },
+    {
+      "code": "27209",
+      "name": "守口市",
+      "group": "keihan_osaka"
+    },
+    {
+      "code": "27114",
+      "name": "大阪市東淀川区",
+      "group": "osaka_north"
+    },
+    {
+      "code": "27123",
+      "name": "大阪市淀川区",
+      "group": "osaka_north"
+    },
+    {
+      "code": "27117",
+      "name": "大阪市旭区",
+      "group": "osaka_north"
+    },
+    {
+      "code": "27118",
+      "name": "大阪市城東区",
+      "group": "osaka_north"
+    },
+    {
+      "code": "27127",
+      "name": "大阪市北区",
+      "group": "osaka_center"
+    },
+    {
+      "code": "27102",
+      "name": "大阪市都島区",
+      "group": "osaka_center"
+    },
+    {
+      "code": "27128",
+      "name": "大阪市中央区",
+      "group": "osaka_center"
+    },
+    {
+      "code": "28202",
+      "name": "尼崎市",
+      "group": "hanshin"
+    }
+  ],
+  "bbox": {
+    "west": 135.3,
+    "south": 34.6,
+    "east": 135.8,
+    "north": 35.03
+  },
+  "target_lines": [
+    {
+      "operator": "西日本旅客鉄道",
+      "line": "東海道線",
+      "label": "JR京都線・JR神戸線"
+    },
+    {
+      "operator": "阪急電鉄",
+      "line": "京都線",
+      "label": "阪急京都線"
+    },
+    {
+      "operator": "京阪電気鉄道",
+      "line": "京阪本線",
+      "label": "京阪本線"
+    },
+    {
+      "operator": "西日本旅客鉄道",
+      "line": "福知山線",
+      "label": "JR宝塚線"
+    },
+    {
+      "operator": "阪急電鉄",
+      "line": "神戸線",
+      "label": "阪急神戸線"
+    },
+    {
+      "operator": "阪神電気鉄道",
+      "line": "本線",
+      "label": "阪神本線"
+    }
+  ],
+  "hazard": {
+    "zoom": 14,
+    "buffer_km": 2.0
+  }
+}

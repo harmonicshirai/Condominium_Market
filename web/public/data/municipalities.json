@@ -1,0 +1,282 @@
+[
+  {
+    "code": "26104",
+    "name": "京都市中京区",
+    "prefectureCode": "26",
+    "group": "kyoto_center",
+    "groupName": "京都市中心部",
+    "contractCount": 1548,
+    "tradeCount": 989,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "26105",
+    "name": "京都市東山区",
+    "prefectureCode": "26",
+    "group": "kyoto_center",
+    "groupName": "京都市中心部",
+    "contractCount": 210,
+    "tradeCount": 117,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "26106",
+    "name": "京都市下京区",
+    "prefectureCode": "26",
+    "group": "kyoto_center",
+    "groupName": "京都市中心部",
+    "contractCount": 1061,
+    "tradeCount": 987,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "26107",
+    "name": "京都市南区",
+    "prefectureCode": "26",
+    "group": "kyoto_southwest",
+    "groupName": "京都市南西部",
+    "contractCount": 652,
+    "tradeCount": 640,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "26108",
+    "name": "京都市右京区",
+    "prefectureCode": "26",
+    "group": "kyoto_southwest",
+    "groupName": "京都市南西部",
+    "contractCount": 985,
+    "tradeCount": 661,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "26111",
+    "name": "京都市西京区",
+    "prefectureCode": "26",
+    "group": "kyoto_southwest",
+    "groupName": "京都市南西部",
+    "contractCount": 286,
+    "tradeCount": 122,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "26109",
+    "name": "京都市伏見区",
+    "prefectureCode": "26",
+    "group": "fushimi_yawata",
+    "groupName": "伏見・八幡",
+    "contractCount": 1385,
+    "tradeCount": 687,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "26210",
+    "name": "八幡市",
+    "prefectureCode": "26",
+    "group": "fushimi_yawata",
+    "groupName": "伏見・八幡",
+    "contractCount": 201,
+    "tradeCount": 106,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "26208",
+    "name": "向日市",
+    "prefectureCode": "26",
+    "group": "otokuni",
+    "groupName": "乙訓",
+    "contractCount": 203,
+    "tradeCount": 90,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "26209",
+    "name": "長岡京市",
+    "prefectureCode": "26",
+    "group": "otokuni",
+    "groupName": "乙訓",
+    "contractCount": 284,
+    "tradeCount": 95,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "26303",
+    "name": "大山崎町",
+    "prefectureCode": "26",
+    "group": "otokuni",
+    "groupName": "乙訓",
+    "contractCount": 111,
+    "tradeCount": 8,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27301",
+    "name": "島本町",
+    "prefectureCode": "27",
+    "group": "hokusetsu",
+    "groupName": "北摂東部",
+    "contractCount": 322,
+    "tradeCount": 158,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27207",
+    "name": "高槻市",
+    "prefectureCode": "27",
+    "group": "hokusetsu",
+    "groupName": "北摂東部",
+    "contractCount": 1355,
+    "tradeCount": 725,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27211",
+    "name": "茨木市",
+    "prefectureCode": "27",
+    "group": "hokusetsu",
+    "groupName": "北摂東部",
+    "contractCount": 1512,
+    "tradeCount": 868,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27224",
+    "name": "摂津市",
+    "prefectureCode": "27",
+    "group": "hokusetsu",
+    "groupName": "北摂東部",
+    "contractCount": 374,
+    "tradeCount": 197,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27205",
+    "name": "吹田市",
+    "prefectureCode": "27",
+    "group": "hokusetsu",
+    "groupName": "北摂東部",
+    "contractCount": 3390,
+    "tradeCount": 2125,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27210",
+    "name": "枚方市",
+    "prefectureCode": "27",
+    "group": "keihan_osaka",
+    "groupName": "京阪沿線（大阪府）",
+    "contractCount": 1507,
+    "tradeCount": 864,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27215",
+    "name": "寝屋川市",
+    "prefectureCode": "27",
+    "group": "keihan_osaka",
+    "groupName": "京阪沿線（大阪府）",
+    "contractCount": 859,
+    "tradeCount": 497,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27223",
+    "name": "門真市",
+    "prefectureCode": "27",
+    "group": "keihan_osaka",
+    "groupName": "京阪沿線（大阪府）",
+    "contractCount": 307,
+    "tradeCount": 153,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27209",
+    "name": "守口市",
+    "prefectureCode": "27",
+    "group": "keihan_osaka",
+    "groupName": "京阪沿線（大阪府）",
+    "contractCount": 601,
+    "tradeCount": 381,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27114",
+    "name": "大阪市東淀川区",
+    "prefectureCode": "27",
+    "group": "osaka_north",
+    "groupName": "大阪市北東部",
+    "contractCount": 869,
+    "tradeCount": 851,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27123",
+    "name": "大阪市淀川区",
+    "prefectureCode": "27",
+    "group": "osaka_north",
+    "groupName": "大阪市北東部",
+    "contractCount": 2024,
+    "tradeCount": 2232,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27117",
+    "name": "大阪市旭区",
+    "prefectureCode": "27",
+    "group": "osaka_north",
+    "groupName": "大阪市北東部",
+    "contractCount": 423,
+    "tradeCount": 331,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27118",
+    "name": "大阪市城東区",
+    "prefectureCode": "27",
+    "group": "osaka_north",
+    "groupName": "大阪市北東部",
+    "contractCount": 1466,
+    "tradeCount": 1101,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27127",
+    "name": "大阪市北区",
+    "prefectureCode": "27",
+    "group": "osaka_center",
+    "groupName": "大阪市中心部",
+    "contractCount": 3568,
+    "tradeCount": 2639,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27102",
+    "name": "大阪市都島区",
+    "prefectureCode": "27",
+    "group": "osaka_center",
+    "groupName": "大阪市中心部",
+    "contractCount": 1148,
+    "tradeCount": 1095,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "27128",
+    "name": "大阪市中央区",
+    "prefectureCode": "27",
+    "group": "osaka_center",
+    "groupName": "大阪市中心部",
+    "contractCount": 3603,
+    "tradeCount": 3192,
+    "latestPeriod": "2026Q1"
+  },
+  {
+    "code": "28202",
+    "name": "尼崎市",
+    "prefectureCode": "28",
+    "group": "hanshin",
+    "groupName": "阪神間",
+    "contractCount": 2321,
+    "tradeCount": 1403,
+    "latestPeriod": "2026Q1"
+  }
+]
