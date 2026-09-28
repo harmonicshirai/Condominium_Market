@@ -176,6 +176,23 @@ export interface LocalMeta {
   detailCommandTemplate: string;
 }
 
+/** auto は年齢から選ぶ（80歳までに15年の返済期間が取れなければ利息のみ型） */
+export type LoanMethod = 'auto' | 'interest_only' | 'amortizing';
+
+/** 支払いの試算の設定（financing.ts） */
+export interface FinancingSettings {
+  showLoan: boolean;
+  ageYears: number | null;
+  /** 年収（年金を含む） */
+  annualIncomeYen: number | null;
+  ratePct: number;
+  method: LoanMethod;
+  /** 元利均等の返済期間。null は「80歳 − 年齢」（最長35年） */
+  termYears: number | null;
+  /** 利息のみ型の借入上限（担保評価額に対する割合、%） */
+  loanToValuePct: number;
+}
+
 export interface MyConditions {
   budgetYen: number | null;
   minAreaSqm: number | null;
@@ -183,6 +200,7 @@ export interface MyConditions {
   maxMonthlyFeesYen: number | null;
   negotiationRate: number;
   closingCostRate: number;
+  financing: FinancingSettings;
 }
 
 export type Label = 'below' | 'near' | 'above' | 'hold';

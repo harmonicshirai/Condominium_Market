@@ -35,6 +35,12 @@ describe('local storage', () => {
     expect(readConditions(storage)).toEqual(DEFAULT_CONDITIONS);
   });
 
+  it('fills payment settings for conditions saved before they existed', () => {
+    const { financing: _unused, ...legacy } = DEFAULT_CONDITIONS;
+    const storage = fakeStorage({ [CONDITIONS_KEY]: JSON.stringify({ ...legacy, budgetYen: 30_000_000 }) });
+    expect(readConditions(storage)).toEqual({ ...DEFAULT_CONDITIONS, budgetYen: 30_000_000 });
+  });
+
   it('validates export schema and merges duplicate ids only when requested', () => {
     const payload = JSON.parse(createExport([listing], DEFAULT_CONDITIONS, new Date('2026-09-25T00:00:00.000Z'))) as unknown;
     expect((payload as { schema: string }).schema).toBe(EXPORT_SCHEMA);

@@ -11,6 +11,7 @@ import { lookupHazard } from '../lib/hazard';
 import { listingRegionChange } from '../lib/regionIndex';
 import ComparableCharts from './ComparableCharts';
 import ComparableTable from './ComparableTable';
+import PaymentCard from './PaymentCard';
 import PriceHistory from './PriceHistory';
 
 const valuationConfig = valuationJson as ValuationConfig;
@@ -103,6 +104,8 @@ export default function ListingDetail({ listing, municipalities, priceIndex, met
           {listing.memo ? <p className="detail-memo">メモ: {listing.memo}</p> : null}
           {notes}
         </section>
+
+        <PaymentCard listing={listing} conditions={conditions} />
 
         <section className="detail-card evaluation-card">
           <h3>相場との比較</h3>

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { Listing, MyConditions } from '../types';
+import { DEFAULT_FINANCING } from './financing';
 
 export const LISTINGS_KEY = 'keihan-mansion-map:v1:listings';
 export const CONDITIONS_KEY = 'keihan-mansion-map:v1:conditions';
@@ -52,6 +53,17 @@ export const listingSchema = listingBaseSchema.superRefine((listing, context) =>
   }
 });
 
+// 以前に保存した条件（financing がない）も読めるように、項目ごとに既定値を持たせる
+export const financingSchema = z.object({
+  showLoan: z.boolean().default(DEFAULT_FINANCING.showLoan),
+  ageYears: z.number().int().min(18).max(120).nullable().default(DEFAULT_FINANCING.ageYears),
+  annualIncomeYen: nullableNumber.default(DEFAULT_FINANCING.annualIncomeYen),
+  ratePct: z.number().min(0).max(20).default(DEFAULT_FINANCING.ratePct),
+  method: z.enum(['auto', 'interest_only', 'amortizing']).default(DEFAULT_FINANCING.method),
+  termYears: z.number().int().min(1).max(50).nullable().default(DEFAULT_FINANCING.termYears),
+  loanToValuePct: z.number().min(0).max(100).default(DEFAULT_FINANCING.loanToValuePct),
+});
+
 export const conditionsSchema = z.object({
   budgetYen: nullableNumber,
   minAreaSqm: nullableNumber,
@@ -59,6 +71,7 @@ export const conditionsSchema = z.object({
   maxMonthlyFeesYen: nullableNumber,
   negotiationRate: z.number().min(0).max(0.2),
   closingCostRate: z.number().min(0).max(1),
+  financing: financingSchema.prefault({}),
 });
 
 const exportSchema = z.object({
@@ -76,6 +89,7 @@ export const DEFAULT_CONDITIONS: MyConditions = {
   maxMonthlyFeesYen: null,
   negotiationRate: 0,
   closingCostRate: 0.07,
+  financing: DEFAULT_FINANCING,
 };
 
 export type StorageLike = Pick<Storage, 'getItem' | 'setItem'>;

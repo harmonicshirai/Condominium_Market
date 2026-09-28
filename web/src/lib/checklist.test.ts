@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Evaluation, Listing, MyConditions, ValuationConfig } from '../types';
 import { buildChecklist } from './checklist';
+import { DEFAULT_FINANCING } from './financing';
 
 const listing: Listing = {
   id: 'a', name: '物件', sourceUrl: '', municipalityCode: '27207', addressText: '', lat: null, lon: null,
@@ -9,7 +10,7 @@ const listing: Listing = {
   renovation: { status: 'unknown', year: null, scope: '', evidence: '' },
   priceHistory: [{ date: '2026-09-01', priceYen: 30_000_000, memo: '' }], memo: '', createdAt: '', updatedAt: '',
 };
-const conditions: MyConditions = { budgetYen: 40_000_000, minAreaSqm: 60, maxWalkMinutes: 10, maxMonthlyFeesYen: 30_000, negotiationRate: 0, closingCostRate: 0.07 };
+const conditions: MyConditions = { budgetYen: 40_000_000, minAreaSqm: 60, maxWalkMinutes: 10, maxMonthlyFeesYen: 30_000, negotiationRate: 0, closingCostRate: 0.07, financing: DEFAULT_FINANCING };
 const config: ValuationConfig = {
   priceCategory: 'contract', minComparables: 10, holdBelow: 5,
   base: { walkMinutesDiff: 5, periodQuarters: 8, ageYears: 7, areaRatio: 0.25, scope: 'municipality', includeTrade: false },

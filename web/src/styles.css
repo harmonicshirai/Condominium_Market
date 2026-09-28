@@ -231,3 +231,20 @@ main { flex: 1; }
 /* 共有用ファイルの読み込み */
 .import-card p { line-height: 1.7; }
 .import-steps { margin: 0 0 0.8rem; padding-left: 1.3rem; line-height: 1.8; }
+
+/* 支払いの目安（一括の総額・ローンの試算） */
+.conditions-form__heading { margin: 1rem 0 0; padding-top: 1rem; border-top: 1px solid var(--color-border); font-size: 1rem; }
+.financing-summary { max-width: 850px; }
+.financing-summary h4, .payment-card h4 { margin: 1.2rem 0 0.5rem; font-size: 0.92rem; }
+.financing-notes { margin: 0.8rem 0; padding-left: 1.2rem; color: var(--color-text); font-size: 0.84rem; line-height: 1.7; }
+.financing-table td, .financing-table th { white-space: nowrap; }
+.cell--over { color: var(--color-muted); }
+.evaluation-stats small { color: var(--color-muted); font-size: 0.72rem; }
+.budget-fit--cash { color: var(--color-ok); }
+.budget-fit--with_loan { color: var(--color-accent-strong); }
+.budget-fit--over { color: var(--color-warn); }
+.budget-fit--unknown { color: var(--color-muted); }
+.loan-status { display: inline-block; margin: 0 0 0.4rem; padding: 0.2rem 0.65rem; border: 1px solid var(--color-border); border-radius: 99px; font-size: 0.8rem; font-weight: 650; }
+.loan-status--ok { color: var(--color-ok); }
+.loan-status--conditional { color: var(--color-warn); }
+.loan-status--ineligible { color: var(--color-ng); }
