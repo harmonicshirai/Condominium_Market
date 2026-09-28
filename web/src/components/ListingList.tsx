@@ -2,6 +2,9 @@ import { useRef, useState } from 'react';
 import type { Evaluation, Listing, Municipality, MyConditions } from '../types';
 import { formatManYen, labelText, seismicText } from '../lib/format';
 import { downloadExport, importedDuplicateIds, importExport, readImportFile } from '../lib/storage';
+import { localIsoDate } from '../lib/format';
+import { NARROW_QUERY, useMediaQuery } from '../lib/useMediaQuery';
+import ListingCard from './ListingCard';
 
 interface ListingListProps {
   listings: Listing[];
@@ -24,6 +27,7 @@ export default function ListingList({ listings, municipalities, conditions, onEd
   const [judgment, setJudgment] = useState('');
   const [message, setMessage] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const narrow = useMediaQuery(NARROW_QUERY);
   const filtered = listings.filter((listing) => {
     const askingPrice = listing.priceHistory.at(-1)?.priceYen ?? 0;
     const age = listing.buildingYear === null ? null : new Date().getFullYear() - listing.buildingYear;
@@ -73,7 +77,22 @@ export default function ListingList({ listings, municipalities, conditions, onEd
         <label>築年数上限<input type="number" min="0" value={maximumAge} onChange={(event) => setMaximumAge(event.target.value)} /></label>
         <label>判定<select value={judgment} onChange={(event) => setJudgment(event.target.value)}><option value="">すべて</option><option value="below">{labelText('below')}</option><option value="near">{labelText('near')}</option><option value="above">{labelText('above')}</option><option value="hold">判定保留</option></select></label>
       </div>
-      {filtered.length === 0 ? <p className="empty-state">登録した物件はありません</p> : (
+      {filtered.length === 0 ? <p className="empty-state">登録した物件はありません</p> : narrow ? (
+        <div className="card-list">{filtered.map((listing) => (
+          <ListingCard
+            key={listing.id}
+            listing={listing}
+            municipalityName={municipalities.find((item) => item.code === listing.municipalityCode)?.name ?? '不明'}
+            evaluation={evaluations.get(listing.id)}
+            today={localIsoDate()}
+            onOpen={() => onSelect(listing)}
+            footer={<>
+              <button type="button" className="text-button" onClick={() => onEdit(listing)}>編集</button>
+              <button type="button" className="text-button text-button--danger" onClick={() => { if (window.confirm('この物件を削除しますか？')) onRemove(listing.id); }}>削除</button>
+            </>}
+          />
+        ))}</div>
+      ) : (
         <div className="table-wrap">
           <table className="listing-table">
             <thead><tr><th>物件名</th><th>市区町村</th><th>売出価格</th><th>面積</th><th>築年・耐震</th><th>徒歩分</th><th>判定</th><th>操作</th></tr></thead>

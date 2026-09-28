@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react';
 import type { ChangeKind, ListingChange } from '../lib/changes';
 import { countChanges } from '../lib/changes';
 import ChangeBadge, { CHANGE_TEXT, formatCheckedAt } from './ChangeBadge';
+import ListingCard from './ListingCard';
+import { paymentPlan } from '../lib/financing';
+import { NARROW_QUERY, useMediaQuery } from '../lib/useMediaQuery';
 import type { Confidence, Evaluation, LocalListing, Municipality, MyConditions } from '../types';
 import { formatManYen, formatPct, formatPpsqm, labelText, seismicText } from '../lib/format';
 import { detailCommand, matchesConditions, type LocalData } from '../lib/localListings';
@@ -32,6 +35,19 @@ interface LocalListingsPanelProps {
 }
 
 const CHANGE_KINDS: ChangeKind[] = ['new', 'price_down', 'price_up', 'removed'];
+// スマホでは表の見出しで並べ替えられないので、選択肢で選ぶ
+const SORT_OPTIONS: { key: SortKey; ascending: boolean; label: string }[] = [
+  { key: 'gap', ascending: true, label: '相場比が低い順' },
+  { key: 'gap', ascending: false, label: '相場比が高い順' },
+  { key: 'price', ascending: true, label: '価格が安い順' },
+  { key: 'price', ascending: false, label: '価格が高い順' },
+  { key: 'ppsqm', ascending: true, label: '㎡単価が安い順' },
+  { key: 'area', ascending: false, label: '面積が広い順' },
+  { key: 'built', ascending: false, label: '築年が新しい順' },
+  { key: 'walk', ascending: true, label: '駅に近い順' },
+  { key: 'days', ascending: false, label: '掲載日数が長い順' },
+  { key: 'days', ascending: true, label: '掲載日数が短い順' },
+];
 
 type SortKey = 'gap' | 'price' | 'ppsqm' | 'area' | 'built' | 'walk' | 'days';
 const PAGE_SIZE = 50;
@@ -55,6 +71,7 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
   const [ascending, setAscending] = useState(true);
   const [page, setPage] = useState(0);
   const [copied, setCopied] = useState('');
+  const narrow = useMediaQuery(NARROW_QUERY);
 
   const rows = useMemo(() => {
     const minConfidenceIndex = CONFIDENCE_ORDER.indexOf(minConfidence);
@@ -180,6 +197,18 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
         )}
       </div>
       {evaluationsLoading ? <p className="data-empty-note" role="status">相場との比較を計算しています。</p> : null}
+      <details className="filter-details" open={!narrow} key={narrow ? 'narrow' : 'wide'}>
+      <summary>絞り込み{narrow ? '・並び順' : ''}</summary>
+      {narrow ? (
+        <label className="form-field sort-select">並び順
+          <select value={`${sortKey}-${ascending ? 'asc' : 'desc'}`} onChange={(event) => {
+            const option = SORT_OPTIONS.find((item) => `${item.key}-${item.ascending ? 'asc' : 'desc'}` === event.target.value);
+            if (option) { setSortKey(option.key); setAscending(option.ascending); setPage(0); }
+          }}>
+            {SORT_OPTIONS.map((item) => <option key={`${item.key}-${item.ascending}`} value={`${item.key}-${item.ascending ? 'asc' : 'desc'}`}>{item.label}</option>)}
+          </select>
+        </label>
+      ) : null}
       <div className="filter-row" aria-label="掲載物件を絞り込む">
         <label>市区町村<select value={municipalityCode} onChange={(event) => { setMunicipalityCode(event.target.value); setPage(0); }}><option value="">すべて</option>{[...new Set(data.listings.map((item) => item.municipalityCode))].map((code) => <option key={code} value={code}>{municipalityName(code)}</option>)}</select></label>
         <label>判定<select value={label} onChange={(event) => { setLabel(event.target.value); setPage(0); }}><option value="">すべて</option><option value="below">{labelText('below')}</option><option value="near">{labelText('near')}</option><option value="above">{labelText('above')}</option><option value="hold">判定保留</option></select></label>
@@ -198,9 +227,33 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
         <label><input type="checkbox" checked={onlyStarred} onChange={(event) => { setOnlyStarred(event.target.checked); setPage(0); }} />保存した物件だけ</label>
         {data.origin !== 'file' ? <button type="button" className="button button--quiet" disabled={!command} title="保存した物件のうち、詳細が未取得のものを取得するコマンド" onClick={() => void copyCommand()}>詳細取得コマンドをコピー</button> : null}
       </div>
+      </details>
       {copied ? <p className="form-note" role="status">{copied}</p> : null}
       <p className="count-note">{rows.length}件（判定が保留の物件は、相場比の並べ替えで後ろに回ります）</p>
-      {rows.length === 0 ? <p className="empty-state">条件に合う物件はありません</p> : (
+      {rows.length === 0 ? <p className="empty-state">条件に合う物件はありません</p> : narrow ? (
+        <div className="card-list">{visible.map((listing) => {
+          const plan = paymentPlan({ listing, negotiationRate: conditions.negotiationRate, closingCostRate: conditions.closingCostRate, budgetYen: conditions.budgetYen, settings: conditions.financing });
+          return (
+            <ListingCard
+              key={listing.id}
+              listing={listing}
+              municipalityName={municipalityName(listing.municipalityCode)}
+              evaluation={evaluations.get(listing.id)}
+              today={today}
+              onOpen={() => onOpen(listing)}
+              saved={starred.has(listing.id)}
+              onToggleSave={() => onToggleStar(listing.id)}
+              totalCostYen={plan?.totalCostYen ?? null}
+              removed={listing.status === 'removed'}
+              badges={changes.has(listing.id) || listing.status === 'removed' || listing.dupGroup ? <>
+                <ChangeBadge change={changes.get(listing.id)} />
+                {listing.status === 'removed' && !changes.has(listing.id) ? <span className="badge badge--removed">掲載終了</span> : null}
+                {listing.dupGroup ? <span className="badge">重複候補あり</span> : null}
+              </> : null}
+            />
+          );
+        })}</div>
+      ) : (
         <div className="table-wrap">
           <table className="listing-table">
             <thead><tr>

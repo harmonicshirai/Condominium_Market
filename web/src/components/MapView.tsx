@@ -247,17 +247,20 @@ ${props.period}`
             <a href="https://disaportal.gsi.go.jp/hazardmap/copyright/opendata.html" target="_blank" rel="noopener noreferrer">凡例はハザードマップポータルサイトで確認</a>
           </div>
         </details>
-        {stations ? (
+        {stations || localListings ? (
           <div className="local-legend">
-            <label><input type="checkbox" checked={showStations} onChange={(event) => setShowStations(event.target.checked)} />駅と駅別の成約相場</label>
-            <small>対象路線の駅の色は成約㎡単価の中央値（濃いほど高い）、大きさは件数（直近8四半期）。白は駅別データなし</small>
+            {stations ? <label><input type="checkbox" checked={showStations} onChange={(event) => setShowStations(event.target.checked)} />駅別の成約相場</label> : null}
+            {localListings ? <label><input type="checkbox" checked={showLocal} onChange={(event) => setShowLocal(event.target.checked)} />掲載物件</label> : null}
           </div>
         ) : null}
-        {localListings ? (
-          <div className="local-legend">
-            <label><input type="checkbox" checked={showLocal} onChange={(event) => setShowLocal(event.target.checked)} />掲載物件（手元）</label>
-            <small>塗りつぶし＝正確な位置、縁だけ＝おおよその位置（住所から推定）。色は判定（緑＝相場より低い、青緑＝近い、橙＝高い、灰＝保留）</small>
-          </div>
+        {stations || localListings ? (
+          <details className="hazard-toggle legend-help">
+            <summary>凡例</summary>
+            <div className="hazard-toggle__items">
+              {stations ? <small>駅：対象路線の駅の色は成約㎡単価の中央値（濃いほど高い）、大きさは件数（直近8四半期）。白は駅別データなし</small> : null}
+              {localListings ? <small>掲載物件：塗りつぶし＝正確な位置、縁だけ＝おおよその位置（住所から推定）。色は判定（緑＝相場より低い、青緑＝近い、橙＝高い、灰＝保留）</small> : null}
+            </div>
+          </details>
         ) : null}
       </div>
     </section>
