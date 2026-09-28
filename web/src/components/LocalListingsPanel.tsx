@@ -1,4 +1,7 @@
 import { useMemo, useState } from 'react';
+import type { ChangeKind, ListingChange } from '../lib/changes';
+import { countChanges } from '../lib/changes';
+import ChangeBadge, { CHANGE_TEXT, formatCheckedAt } from './ChangeBadge';
 import type { Confidence, Evaluation, LocalListing, Municipality, MyConditions } from '../types';
 import { formatManYen, formatPct, formatPpsqm, labelText, seismicText } from '../lib/format';
 import { detailCommand, matchesConditions, type LocalData } from '../lib/localListings';
@@ -20,13 +23,21 @@ interface LocalListingsPanelProps {
   /** 共有ファイルから読み込んだデータなら、読み直し・削除のボタンを出す */
   onReplace?: () => void;
   onClear?: () => void;
+  /** 前回確認したときからの変化 */
+  changes: ReadonlyMap<string, ListingChange>;
+  checkedAt: string | null;
+  /** このブラウザで初めてデータを見た（今のデータを基準にした） */
+  firstCheck: boolean;
+  onMarkChecked: () => void;
 }
+
+const CHANGE_KINDS: ChangeKind[] = ['new', 'price_down', 'price_up', 'removed'];
 
 type SortKey = 'gap' | 'price' | 'ppsqm' | 'area' | 'built' | 'walk' | 'days';
 const PAGE_SIZE = 50;
 const CONFIDENCE_ORDER: Confidence[] = ['A', 'B', 'C', 'D'];
 
-export default function LocalListingsPanel({ data, evaluations, evaluationsLoading, municipalities, conditions, starred, onToggleStar, onOpen, today, onExport, onReplace, onClear }: LocalListingsPanelProps) {
+export default function LocalListingsPanel({ data, evaluations, evaluationsLoading, municipalities, conditions, starred, onToggleStar, onOpen, today, onExport, onReplace, onClear, changes, checkedAt, firstCheck, onMarkChecked }: LocalListingsPanelProps) {
   const [municipalityCode, setMunicipalityCode] = useState('');
   const [label, setLabel] = useState('');
   const [minConfidence, setMinConfidence] = useState<Confidence>('C');
@@ -39,6 +50,7 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
   const [onlyMine, setOnlyMine] = useState(false);
   const [dedupe, setDedupe] = useState(true);
   const [onlyStarred, setOnlyStarred] = useState(false);
+  const [changeFilter, setChangeFilter] = useState<'' | 'any' | ChangeKind>('');
   const [sortKey, setSortKey] = useState<SortKey>('gap');
   const [ascending, setAscending] = useState(true);
   const [page, setPage] = useState(0);
@@ -49,7 +61,10 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
     let filtered = data.listings.filter((listing) => {
       const evaluation = evaluations.get(listing.id);
       const price = listing.priceHistory.at(-1)?.priceYen ?? 0;
-      if (status && listing.status !== status) return false;
+      const change = changes.get(listing.id);
+      if (changeFilter && (changeFilter === 'any' ? !change : change?.kind !== changeFilter)) return false;
+      // 変化で絞り込むときは、掲載終了になった物件も出す
+      if (status && listing.status !== status && !(changeFilter && change)) return false;
       if (municipalityCode && listing.municipalityCode !== municipalityCode) return false;
       if (label && (evaluation?.label ?? 'hold') !== label) return false;
       if (label !== 'hold' && evaluation && CONFIDENCE_ORDER.indexOf(evaluation.confidence) > minConfidenceIndex) return false;
@@ -92,7 +107,7 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
       if (b === null) return -1;
       return ascending ? a - b : b - a;
     });
-  }, [data.listings, evaluations, municipalityCode, label, minConfidence, maxPriceMan, minArea, maxWalk, minBuilt, seismic, status, onlyMine, dedupe, onlyStarred, sortKey, ascending, conditions, starred, today]);
+  }, [data.listings, evaluations, municipalityCode, label, minConfidence, maxPriceMan, minArea, maxWalk, minBuilt, seismic, status, onlyMine, dedupe, onlyStarred, sortKey, ascending, conditions, starred, today, changes, changeFilter]);
 
   const pageCount = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount - 1);
@@ -100,6 +115,11 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
   const municipalityName = (code: string) => municipalities.find((item) => item.code === code)?.name ?? code;
   const command = detailCommand(data.listings, starred, data.meta.detailCommandTemplate);
   const counts = data.meta.counts;
+  const changeCounts = countChanges(changes);
+  const changeTotal = CHANGE_KINDS.reduce((sum, kind) => sum + changeCounts[kind], 0);
+  const savedChangeCounts = countChanges(changes, starred);
+  const savedChanged = CHANGE_KINDS.filter((kind) => kind !== 'new' && savedChangeCounts[kind] > 0);
+  const pickChange = (value: '' | 'any' | ChangeKind) => { setChangeFilter(value); setPage(0); };
 
   function sortBy(key: SortKey): void {
     if (sortKey === key) setAscending((value) => !value);
@@ -140,6 +160,25 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
         {onClear ? <button type="button" className="button button--quiet" onClick={onClear}>このブラウザから消す</button> : null}
       </div>
       {onExport ? <p className="form-note">書き出したファイルを家族などに送ると、公開サイトの「掲載物件」タブで読み込んで同じように見られます。</p> : null}
+      <div className="change-banner" role="status">
+        {firstCheck || !checkedAt ? (
+          <p>今のデータを「確認済み」の基準にしました。次にデータが新しくなると、ここに新着・値下げ・掲載終了が出ます。</p>
+        ) : changeTotal === 0 ? (
+          <p>前回の確認（{formatCheckedAt(checkedAt)}）から変化はありません。</p>
+        ) : (
+          <>
+            <p>前回の確認（{formatCheckedAt(checkedAt)}）からの変化：</p>
+            <div className="change-banner__chips">
+              {CHANGE_KINDS.map((kind) => changeCounts[kind] > 0 ? (
+                <button key={kind} type="button" className={`badge badge--${kind} badge--button`} aria-pressed={changeFilter === kind} onClick={() => pickChange(changeFilter === kind ? '' : kind)}>{CHANGE_TEXT[kind]} {changeCounts[kind]}件</button>
+              ) : null)}
+              {changeFilter ? <button type="button" className="text-button" onClick={() => pickChange('')}>絞り込みを解除</button> : null}
+            </div>
+            {savedChanged.length > 0 ? <p className="change-banner__saved">保存した物件：{savedChanged.map((kind) => `${CHANGE_TEXT[kind]} ${savedChangeCounts[kind]}件`).join('・')}</p> : null}
+            <button type="button" className="button button--quiet" onClick={() => { onMarkChecked(); pickChange(''); }}>すべて確認済みにする</button>
+          </>
+        )}
+      </div>
       {evaluationsLoading ? <p className="data-empty-note" role="status">相場との比較を計算しています。</p> : null}
       <div className="filter-row" aria-label="掲載物件を絞り込む">
         <label>市区町村<select value={municipalityCode} onChange={(event) => { setMunicipalityCode(event.target.value); setPage(0); }}><option value="">すべて</option>{[...new Set(data.listings.map((item) => item.municipalityCode))].map((code) => <option key={code} value={code}>{municipalityName(code)}</option>)}</select></label>
@@ -150,6 +189,7 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
         <label>徒歩上限（分）<input type="number" min="0" value={maxWalk} onChange={(event) => { setMaxWalk(event.target.value); setPage(0); }} /></label>
         <label>築年（以降）<input type="number" min="1900" value={minBuilt} onChange={(event) => { setMinBuilt(event.target.value); setPage(0); }} /></label>
         <label>耐震<select value={seismic} onChange={(event) => { setSeismic(event.target.value); setPage(0); }}><option value="">すべて</option><option value="new">新耐震</option><option value="unknown">要確認</option><option value="old">旧耐震</option></select></label>
+        <label>前回からの変化<select value={changeFilter} onChange={(event) => pickChange(event.target.value as '' | 'any' | ChangeKind)}><option value="">すべて</option><option value="any">変化があった物件</option>{CHANGE_KINDS.map((kind) => <option key={kind} value={kind}>{CHANGE_TEXT[kind]}</option>)}</select></label>
         <label>掲載<select value={status} onChange={(event) => { setStatus(event.target.value as 'active' | 'removed' | ''); setPage(0); }}><option value="active">掲載中のみ</option><option value="removed">掲載終了のみ</option><option value="">すべて</option></select></label>
       </div>
       <div className="check-row">
@@ -176,7 +216,7 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
               return (
                 <tr key={listing.id} onClick={() => onOpen(listing)} className={listing.status === 'removed' ? 'row--removed' : undefined}>
                   <td><button type="button" className="star-button" aria-pressed={isStarred} aria-label={isStarred ? '保存を外す' : '保存する'} title={isStarred ? '保存を外す' : '保存する（保存・比較タブに集まります）'} onClick={(event) => { event.stopPropagation(); onToggleStar(listing.id); }}>{isStarred ? '★' : '☆'}</button></td>
-                  <td><a href={listing.sourceUrl} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()}>{listing.name || '名称なし'}</a>{listing.status === 'removed' ? <><br /><small>掲載終了</small></> : null}{listing.dupGroup ? <><br /><small>重複候補あり</small></> : null}</td>
+                  <td><a href={listing.sourceUrl} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()}>{listing.name || '名称なし'}</a>{listing.status === 'removed' ? <><br /><small>掲載終了</small></> : null}{listing.dupGroup ? <><br /><small>重複候補あり</small></> : null}{changes.has(listing.id) ? <div className="row-badges"><ChangeBadge change={changes.get(listing.id)} /></div> : null}</td>
                   <td>{municipalityName(listing.municipalityCode)}<br /><small>{listing.station || '駅不明'}</small></td>
                   <td>{formatManYen(price)}</td>
                   <td>{formatPpsqm(price / listing.areaSqm)}</td>

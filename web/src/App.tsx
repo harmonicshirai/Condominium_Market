@@ -15,6 +15,8 @@ import { labelText, localIsoDate } from './lib/format';
 import { deleteStoredBundle, downloadBundle, loadLocalData, readStarred, readStoredBundle, saveStarred, toMyListing, type LocalData } from './lib/localListings';
 import { makeTimeAdjuster } from './lib/regionIndex';
 import { collectSaved, readCompare, saveCompare, toggleCompareId, type SavedItem } from './lib/saved';
+import { diffListings, readSnapshot, saveSnapshot, takeSnapshot, type ListingChange, type SeenSnapshot } from './lib/changes';
+import ChangeBadge from './components/ChangeBadge';
 import { useEvaluations } from './lib/useEvaluations';
 import { useListings } from './lib/useListings';
 import type { Listing, LocalListing, Meta, Municipality, PriceIndex, RegionIndex, Station, ValuationConfig } from './types';
@@ -56,6 +58,8 @@ export default function App() {
   const [compareIds, setCompareIds] = useState<string[]>(() => readCompare());
   // 物件詳細の「戻る」で戻るタブ（保存・比較や地図から開いたとき）
   const [returnTab, setReturnTab] = useState<Tab | null>(null);
+  // 前回「確認済み」にした時点の価格と掲載状態（このブラウザだけ）
+  const [seen, setSeen] = useState<{ snapshot: SeenSnapshot; firstCheck: boolean } | null>(null);
   const [addedMessage, setAddedMessage] = useState('');
   const [importing, setImporting] = useState(false);
 
@@ -73,6 +77,26 @@ export default function App() {
     // 手元のサーバーのデータがなければ、以前読み込んだ共有ファイル（このブラウザに保存）を使う
     void loadLocalData().then(async (data) => setLocalData(data ?? await readStoredBundle()));
   }, []);
+
+  useEffect(() => {
+    if (!localData) { setSeen(null); return; }
+    const stored = readSnapshot(localData.meta.sourceName);
+    if (stored) { setSeen({ snapshot: stored, firstCheck: false }); return; }
+    // 初めて見たときは今のデータを基準にする
+    const snapshot = takeSnapshot(localData.listings, new Date().toISOString());
+    saveSnapshot(localData.meta.sourceName, snapshot);
+    setSeen({ snapshot, firstCheck: true });
+  }, [localData]);
+  const changes = useMemo(
+    () => localData && seen ? diffListings(localData.listings, seen.snapshot) : new Map<string, ListingChange>(),
+    [localData, seen],
+  );
+  function markChecked(): void {
+    if (!localData) return;
+    const snapshot = takeSnapshot(localData.listings, new Date().toISOString());
+    saveSnapshot(localData.meta.sourceName, snapshot);
+    setSeen({ snapshot, firstCheck: false });
+  }
 
   const updateCompare = useCallback((update: (current: string[]) => string[]) => {
     setCompareIds((current) => {
@@ -355,6 +379,10 @@ export default function App() {
             today={localIsoDate()}
             onExport={localData.origin === 'server' ? () => downloadBundle(localData) : undefined}
             onReplace={localData.origin === 'file' ? () => setImporting(true) : undefined}
+            changes={changes}
+            checkedAt={seen?.snapshot.checkedAt ?? null}
+            firstCheck={seen?.firstCheck ?? true}
+            onMarkChecked={markChecked}
             onClear={localData.origin === 'file' ? () => {
               if (!window.confirm('読み込んだ物件データを、このブラウザから消しますか？')) return;
               void deleteStoredBundle().then(() => { setLocalData(null); setActiveLocalId(null); });
@@ -372,6 +400,7 @@ export default function App() {
             onToggleCompare={toggleCompare}
             onOpen={openSaved}
             onUnsave={(item) => toggleStar(item.listing.id)}
+            badgesFor={(item) => item.kind === 'local' ? <ChangeBadge change={changes.get(item.listing.id)} /> : null}
           />
         ) : null}
         {tab === 'trends' && regionIndex ? (
