@@ -248,3 +248,37 @@ main { flex: 1; }
 .loan-status--ok { color: var(--color-ok); }
 .loan-status--conditional { color: var(--color-warn); }
 .loan-status--ineligible { color: var(--color-ng); }
+
+/* 物件のカード（保存・比較、スマホの一覧） */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 0.9rem; }
+.listing-card { display: grid; gap: 0.35rem; padding: 0.9rem 1rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface); }
+.listing-card--removed { opacity: 0.7; }
+.listing-card p { margin: 0; }
+.listing-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.6rem; }
+.listing-card__name { border: 0; padding: 0; background: none; color: var(--color-accent-strong); font-size: 1rem; font-weight: 650; text-align: left; text-decoration: underline; text-underline-offset: 0.16em; cursor: pointer; }
+.listing-card__place { color: var(--color-muted); font-size: 0.84rem; }
+.listing-card__main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 0.9rem; font-size: 0.9rem; }
+.listing-card__main strong { font-size: 1.2rem; }
+.listing-card__label { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 0.6rem; font-size: 0.88rem; }
+.listing-card__label span { color: var(--color-muted); font-size: 0.8rem; }
+.listing-card__label.evaluation-label--below strong { color: var(--color-ok); }
+.listing-card__label.evaluation-label--above strong { color: var(--color-warn); }
+.listing-card__meta { color: var(--color-muted); font-size: 0.8rem; }
+.listing-card__badges, .row-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.listing-card__footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding-top: 0.45rem; border-top: 1px solid var(--color-border); }
+.listing-card .star-button { display: inline-flex; flex-direction: column; align-items: center; gap: 0.1rem; min-width: 2.6rem; }
+.listing-card .star-button span { color: var(--color-muted); font-size: 0.68rem; }
+.badge { display: inline-block; padding: 0.1rem 0.5rem; border: 1px solid var(--color-border); border-radius: 99px; color: var(--color-muted); font-size: 0.74rem; font-weight: 600; white-space: nowrap; }
+.badge--removed { color: var(--color-ng); border-color: currentColor; }
+.saved-heading { margin: 1.6rem 0 0.6rem; font-size: 1.02rem; }
+.compare-wrap { border-top: 0; }
+.compare-table { border-collapse: separate; border-spacing: 0; font-size: 0.86rem; }
+.compare-table th, .compare-table td { min-width: 10rem; max-width: 16rem; padding: 0.65rem 0.7rem; border-bottom: 1px solid var(--color-border); text-align: left; vertical-align: top; }
+.compare-table thead th { vertical-align: bottom; }
+.compare-table small { color: var(--color-muted); font-size: 0.74rem; }
+.compare-table__label { position: sticky; left: 0; z-index: 1; min-width: 7.5rem !important; background: #fff; color: var(--color-muted); font-size: 0.78rem; font-weight: 600; }
+.compare-table__name { display: block; padding: 0 0 0.3rem; font-size: 0.92rem; font-weight: 650; text-align: left; text-decoration: underline; }
+.cell--best { color: var(--color-ok); font-weight: 700; }
+@media (prefers-color-scheme: dark) {
+  .compare-table__label { background: #101b21; }
+}

@@ -8,20 +8,23 @@ import ListingForm from './components/ListingForm';
 import ListingList from './components/ListingList';
 const MapView = lazy(() => import('./components/MapView'));
 import MyConditionsForm from './components/MyConditionsForm';
+import SavedPanel from './components/SavedPanel';
 import valuationJson from './config/valuation.json';
 import { fetchJson, loadSiteData, loadTransactionsForCodes } from './lib/data';
 import { labelText, localIsoDate } from './lib/format';
 import { deleteStoredBundle, downloadBundle, loadLocalData, readStarred, readStoredBundle, saveStarred, toMyListing, type LocalData } from './lib/localListings';
 import { makeTimeAdjuster } from './lib/regionIndex';
+import { collectSaved, readCompare, saveCompare, toggleCompareId, type SavedItem } from './lib/saved';
 import { useEvaluations } from './lib/useEvaluations';
 import { useListings } from './lib/useListings';
 import type { Listing, LocalListing, Meta, Municipality, PriceIndex, RegionIndex, Station, ValuationConfig } from './types';
 
-type Tab = 'map' | 'local' | 'trends' | 'listings' | 'conditions' | 'about';
+type Tab = 'map' | 'local' | 'saved' | 'trends' | 'listings' | 'conditions' | 'about';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'map', label: '地図' },
   { id: 'local', label: '掲載物件' },
+  { id: 'saved', label: '保存・比較' },
   { id: 'trends', label: '地域の動き' },
   { id: 'listings', label: '自分の物件' },
   { id: 'conditions', label: '自分の条件' },
@@ -29,6 +32,7 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 const valuationConfig = valuationJson as ValuationConfig;
 const EMPTY_LOCAL: LocalListing[] = [];
+const BACK_LABELS: Partial<Record<Tab, string>> = { saved: '← 保存・比較へ', trends: '← 地域の動きへ', map: '← 地図へ' };
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('map');
@@ -49,6 +53,9 @@ export default function App() {
   const [trendBasePos, setTrendBasePos] = useState(0);
   const [activeLocalId, setActiveLocalId] = useState<string | null>(null);
   const [starred, setStarred] = useState<Set<string>>(() => readStarred());
+  const [compareIds, setCompareIds] = useState<string[]>(() => readCompare());
+  // 物件詳細の「戻る」で戻るタブ（保存・比較や地図から開いたとき）
+  const [returnTab, setReturnTab] = useState<Tab | null>(null);
   const [addedMessage, setAddedMessage] = useState('');
   const [importing, setImporting] = useState(false);
 
@@ -67,18 +74,28 @@ export default function App() {
     void loadLocalData().then(async (data) => setLocalData(data ?? await readStoredBundle()));
   }, []);
 
-  const toggleStar = useCallback((id: string) => {
-    setStarred((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      saveStarred(next);
+  const updateCompare = useCallback((update: (current: string[]) => string[]) => {
+    setCompareIds((current) => {
+      const next = update(current);
+      saveCompare(next);
       return next;
     });
   }, []);
 
-  const openLocal = useCallback((id: string) => {
+  // 保存したら（比較が4件未満なら）比較にも入れ、保存を外したら比較からも外す
+  const toggleStar = useCallback((id: string) => {
+    const saving = !starred.has(id);
+    const next = new Set(starred);
+    if (saving) next.add(id); else next.delete(id);
+    saveStarred(next);
+    setStarred(next);
+    updateCompare((current) => saving ? toggleCompareId(current.filter((item) => item !== id), id) : current.filter((item) => item !== id));
+  }, [starred, updateCompare]);
+
+  const openLocal = useCallback((id: string, from: Tab | null = null) => {
     setActiveLocalId(id);
     setAddedMessage('');
+    setReturnTab(from);
     setTab('local');
   }, []);
 
@@ -132,7 +149,8 @@ export default function App() {
   });
   const activeLocal = localData?.listings.find((item) => item.id === activeLocalId) ?? null;
 
-  function openDetail(listing: Listing): void {
+  function openDetail(listing: Listing, from: Tab | null = null): void {
+    setReturnTab(from);
     setActiveListingId(listing.id);
     setEditingListing(null);
     setShowForm(false);
@@ -173,8 +191,16 @@ export default function App() {
     setReturnToDetail(false);
   }
 
+  function backFromDetail(): void {
+    setActiveListingId(null);
+    setActiveLocalId(null);
+    if (returnTab) setTab(returnTab);
+    setReturnTab(null);
+  }
+
   function setTabAndClose(nextTab: Tab): void {
     setTab(nextTab);
+    setReturnTab(null);
     if (nextTab !== 'listings') {
       setShowForm(false);
       setLocationMapOpen(false);
@@ -202,6 +228,12 @@ export default function App() {
     </div>
   ) : null;
   const activeListing = listings.find((listing) => listing.id === activeListingId) ?? null;
+  const saved = collectSaved(localListings ?? EMPTY_LOCAL, starred, listings, localEvaluations, evaluations);
+  const openSaved = (item: SavedItem) => item.kind === 'local' ? openLocal(item.listing.id, 'saved') : openDetail(item.listing, 'saved');
+  const toggleCompare = (id: string) => {
+    const available = new Set(saved.items.map((item) => item.listing.id));
+    updateCompare((current) => toggleCompareId(current.filter((item) => available.has(item)), id));
+  };
 
   return (
     <div className="app-shell">
@@ -223,7 +255,7 @@ export default function App() {
           <div className="map-layout">
             <section className="map-main">
               <div className="section-heading"><h2>地図</h2></div>
-              <Suspense fallback={<div className="map-section"><p className="empty-state">地図を読み込み中です。</p></div>}><MapView listings={listings} evaluations={evaluations} onSelectListing={setActiveListingId} localListings={localListings} localEvaluations={localEvaluations} onSelectLocal={openLocal} stations={stations ?? undefined} /></Suspense>
+              <Suspense fallback={<div className="map-section"><p className="empty-state">地図を読み込み中です。</p></div>}><MapView listings={listings} evaluations={evaluations} onSelectListing={setActiveListingId} localListings={localListings} localEvaluations={localEvaluations} onSelectLocal={(id) => openLocal(id, 'map')} stations={stations ?? undefined} /></Suspense>
             </section>
             <aside className="side-panel">
               <div className="section-heading"><h2>登録物件</h2><span className="count-note">{listings.length}件</span></div>
@@ -231,7 +263,7 @@ export default function App() {
                 <ul className="side-list">{listings.slice(0, 8).map((listing) => {
                   const label = evaluations.get(listing.id)?.label;
                   const text = labelText(label ?? 'hold');
-                  return <li key={listing.id}><button type="button" aria-current={activeListingId === listing.id ? 'true' : undefined} onClick={() => openDetail(listing)}>{listing.name || '名称未入力'}<span>{municipalities.find((item) => item.code === listing.municipalityCode)?.name ?? '不明'} ・ {text}</span></button></li>;
+                  return <li key={listing.id}><button type="button" aria-current={activeListingId === listing.id ? 'true' : undefined} onClick={() => openDetail(listing, 'map')}>{listing.name || '名称未入力'}<span>{municipalities.find((item) => item.code === listing.municipalityCode)?.name ?? '不明'} ・ {text}</span></button></li>;
                 })}</ul>
               )}
               <button type="button" className="button button--primary" onClick={beginCreate}>物件を登録</button>
@@ -248,7 +280,8 @@ export default function App() {
             priceIndex={siteData?.priceIndex ?? null}
             meta={siteData?.meta ?? null}
             conditions={conditions}
-            onBack={() => setActiveListingId(null)}
+            onBack={backFromDetail}
+            backLabel={returnTab ? BACK_LABELS[returnTab] : undefined}
             onEdit={() => beginEdit(activeListing, true)}
             onUpdate={upsertListing}
             timeAdjust={timeAdjust}
@@ -288,15 +321,15 @@ export default function App() {
             priceIndex={siteData?.priceIndex ?? null}
             meta={siteData?.meta ?? null}
             conditions={conditions}
-            onBack={() => setActiveLocalId(null)}
-            backLabel="← 掲載物件の一覧へ"
+            onBack={backFromDetail}
+            backLabel={returnTab ? BACK_LABELS[returnTab] : '← 掲載物件の一覧へ'}
             landRights={activeLocal.landRights}
             allowHazard={activeLocal.locationPrecision === 'exact'}
             timeAdjust={timeAdjust}
             regionIndex={regionIndex}
             trendBasePos={trendBasePos}
             actions={<>
-              <button type="button" className="button button--quiet" aria-pressed={starred.has(activeLocal.id)} onClick={() => toggleStar(activeLocal.id)}>{starred.has(activeLocal.id) ? '★ 星を外す' : '☆ 星を付ける'}</button>
+              <button type="button" className="button button--quiet" aria-pressed={starred.has(activeLocal.id)} onClick={() => toggleStar(activeLocal.id)}>{starred.has(activeLocal.id) ? '★ 保存済み（外す）' : '☆ 保存する'}</button>
               <button type="button" className="button button--quiet" onClick={() => addLocalToMine(activeLocal)}>自分の物件に追加</button>
             </>}
             notes={<>
@@ -304,7 +337,7 @@ export default function App() {
               <p className="form-note">
                 {activeLocal.sourceName}の掲載情報（初回 {activeLocal.firstSeen}・最終確認 {activeLocal.lastSeen}{activeLocal.status === 'removed' ? '・掲載終了' : ''}）。
                 位置: {activeLocal.locationPrecision === 'exact' ? '掲載ページの地図' : activeLocal.locationPrecision === 'approx' ? '住所から推定したおおよその位置' : '不明'}。
-                {activeLocal.detailFetchedAt ? `詳細は ${activeLocal.detailFetchedAt} に取得。` : localData?.origin === 'file' ? '詳細（管理費・修繕積立金・階・リフォームなど）は未取得です。' : '詳細（管理費・修繕積立金・階・リフォームなど）は未取得。星を付けて一覧の「詳細取得コマンドをコピー」から取得できます。'}
+                {activeLocal.detailFetchedAt ? `詳細は ${activeLocal.detailFetchedAt} に取得。` : localData?.origin === 'file' ? '詳細（管理費・修繕積立金・階・リフォームなど）は未取得です。' : '詳細（管理費・修繕積立金・階・リフォームなど）は未取得。保存して一覧の「詳細取得コマンドをコピー」から取得できます。'}
                 {activeLocal.landRights ? ` 土地の権利: ${activeLocal.landRights}。` : ''}{activeLocal.totalUnits ? ` 総戸数: ${activeLocal.totalUnits}戸。` : ''}{activeLocal.direction ? ` 向き: ${activeLocal.direction}。` : ''}
               </p>
             </>}
@@ -328,6 +361,19 @@ export default function App() {
             } : undefined}
           />
         )) : null}
+        {tab === 'saved' ? (
+          <SavedPanel
+            items={saved.items}
+            missing={saved.missing}
+            compareIds={compareIds}
+            conditions={conditions}
+            municipalities={municipalities}
+            today={localIsoDate()}
+            onToggleCompare={toggleCompare}
+            onOpen={openSaved}
+            onUnsave={(item) => toggleStar(item.listing.id)}
+          />
+        ) : null}
         {tab === 'trends' && regionIndex ? (
           <Suspense fallback={<section className="content-section"><p>読み込み中です。</p></section>}>
             <MarketTrends
@@ -340,8 +386,8 @@ export default function App() {
                 ...listings.map((listing) => ({ kind: 'mine' as const, listing, evaluation: evaluations.get(listing.id) })),
               ]}
               onOpen={(kind, id) => {
-                if (kind === 'local') openLocal(id);
-                else { const found = listings.find((item) => item.id === id); if (found) openDetail(found); }
+                if (kind === 'local') openLocal(id, 'trends');
+                else { const found = listings.find((item) => item.id === id); if (found) openDetail(found, 'trends'); }
               }}
             />
           </Suspense>

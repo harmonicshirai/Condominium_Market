@@ -155,8 +155,8 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
       <div className="check-row">
         <label><input type="checkbox" checked={onlyMine} onChange={(event) => { setOnlyMine(event.target.checked); setPage(0); }} />自分の条件に合うものだけ</label>
         <label><input type="checkbox" checked={dedupe} onChange={(event) => { setDedupe(event.target.checked); setPage(0); }} />重複候補は最安の1件だけ</label>
-        <label><input type="checkbox" checked={onlyStarred} onChange={(event) => { setOnlyStarred(event.target.checked); setPage(0); }} />星付きだけ</label>
-        {data.origin !== 'file' ? <button type="button" className="button button--quiet" disabled={!command} onClick={() => void copyCommand()}>詳細取得コマンドをコピー</button> : null}
+        <label><input type="checkbox" checked={onlyStarred} onChange={(event) => { setOnlyStarred(event.target.checked); setPage(0); }} />保存した物件だけ</label>
+        {data.origin !== 'file' ? <button type="button" className="button button--quiet" disabled={!command} title="保存した物件のうち、詳細が未取得のものを取得するコマンド" onClick={() => void copyCommand()}>詳細取得コマンドをコピー</button> : null}
       </div>
       {copied ? <p className="form-note" role="status">{copied}</p> : null}
       <p className="count-note">{rows.length}件（判定が保留の物件は、相場比の並べ替えで後ろに回ります）</p>
@@ -164,7 +164,7 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
         <div className="table-wrap">
           <table className="listing-table">
             <thead><tr>
-              <th aria-label="星"></th><th>物件名</th><th>市区町村・駅</th>
+              <th aria-label="保存"></th><th>物件名</th><th>市区町村・駅</th>
               {header('price', '価格')}{header('ppsqm', '㎡単価')}{header('area', '面積')}{header('built', '築年')}{header('walk', '徒歩')}
               {header('gap', '相場比')}<th>判定</th>{header('days', '掲載日数')}<th>詳細</th>
             </tr></thead>
@@ -175,7 +175,7 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
               const isStarred = starred.has(listing.id);
               return (
                 <tr key={listing.id} onClick={() => onOpen(listing)} className={listing.status === 'removed' ? 'row--removed' : undefined}>
-                  <td><button type="button" className="star-button" aria-pressed={isStarred} aria-label={isStarred ? '星を外す' : '星を付ける'} onClick={(event) => { event.stopPropagation(); onToggleStar(listing.id); }}>{isStarred ? '★' : '☆'}</button></td>
+                  <td><button type="button" className="star-button" aria-pressed={isStarred} aria-label={isStarred ? '保存を外す' : '保存する'} title={isStarred ? '保存を外す' : '保存する（保存・比較タブに集まります）'} onClick={(event) => { event.stopPropagation(); onToggleStar(listing.id); }}>{isStarred ? '★' : '☆'}</button></td>
                   <td><a href={listing.sourceUrl} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()}>{listing.name || '名称なし'}</a>{listing.status === 'removed' ? <><br /><small>掲載終了</small></> : null}{listing.dupGroup ? <><br /><small>重複候補あり</small></> : null}</td>
                   <td>{municipalityName(listing.municipalityCode)}<br /><small>{listing.station || '駅不明'}</small></td>
                   <td>{formatManYen(price)}</td>
