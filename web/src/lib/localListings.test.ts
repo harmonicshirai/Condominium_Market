@@ -97,6 +97,17 @@ describe('share bundle', () => {
     expect(data.listings[0].name).toBe('サンプルマンション');
     expect(data.meta.counts.active).toBe(1);
   });
+  it('keeps https floor-plan URLs and blanks anything else without dropping the listing', () => {
+    const text = createBundle({ meta: META, listings: [
+      makeLocal({ id: 'a', floorPlanThumbUrl: 'https://example.com/plan.jpg?w=220&h=165', floorPlanImageUrl: 'https://example.com/plan.jpg?w=500' }),
+      makeLocal({ id: 'b', floorPlanThumbUrl: 'javascript:alert(1)', floorPlanImageUrl: 'http://example.com/plan.jpg' }),
+      makeLocal({ id: 'c' }),
+    ], dropped: 0 });
+    const data = parseBundle(text);
+    expect(data.dropped).toBe(0);
+    expect(data.listings.map((item) => item.floorPlanThumbUrl ?? null)).toEqual(['https://example.com/plan.jpg?w=220&h=165', null, null]);
+    expect(data.listings[1].floorPlanImageUrl).toBeNull();
+  });
   it('rejects files that are not share files', () => {
     expect(() => parseBundle('not json')).toThrow('JSON');
     expect(() => parseBundle(JSON.stringify({ schema: 'other', version: 1 }))).toThrow('共有用ファイル');

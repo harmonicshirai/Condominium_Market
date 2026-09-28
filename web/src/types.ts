@@ -140,6 +140,9 @@ export interface LocalListing extends Listing {
   direction: string | null;
   dupGroup: string | null;
   detailFetchedAt: string | null;
+  /** 間取り図の画像 URL（拡大用・縮小版）。画像は見るときにブラウザが掲載元から読み込む */
+  floorPlanImageUrl?: string | null;
+  floorPlanThumbUrl?: string | null;
 }
 
 /** 騰落指数の1系列（pipeline/build_region_index.py）。値は ln 指数で、periods と同じ並び */

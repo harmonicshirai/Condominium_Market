@@ -3,6 +3,8 @@ import type { Evaluation, Listing, LocalListing, LocalMeta, MyConditions } from 
 import { listingBaseSchema } from './storage';
 
 export const STARRED_KEY = 'keihan-mansion-map:v1:starred';
+// 共有ファイルの中身は信用しないので、画像は https の URL だけ受け付ける（ほかは null にして物件は残す）
+const httpsUrl = z.string().regex(/^https:\/\/[^\s"'<>]+$/);
 
 const localListingSchema = listingBaseSchema.extend({
   floor: z.number().int().nullable(), // 地下階は負の数
@@ -19,6 +21,8 @@ const localListingSchema = listingBaseSchema.extend({
   direction: z.string().nullable(),
   dupGroup: z.string().nullable(),
   detailFetchedAt: z.string().nullable(),
+  floorPlanImageUrl: httpsUrl.nullable().optional().catch(null),
+  floorPlanThumbUrl: httpsUrl.nullable().optional().catch(null),
 });
 
 const localMetaSchema = z.object({

@@ -320,3 +320,16 @@ main { flex: 1; }
   .listing-card__name { font-size: 1.02rem; }
   .text-button { padding: 0.45rem 0.4rem; font-size: 0.84rem; }
 }
+
+/* 間取り図（URL だけ持ち、見るときに読み込む） */
+.floor-plan { display: block; height: auto; aspect-ratio: 4 / 3; border: 1px solid var(--color-border); border-radius: 4px; background: #fff; object-fit: contain; }
+.floor-plan--thumb { width: 72px; max-height: 54px; margin-bottom: 0.2rem; }
+.floor-plan--card { width: 110px; max-height: 83px; }
+.floor-plan--large { width: 100%; max-width: 500px; }
+.floor-plan-link { display: inline-block; line-height: 0; }
+.floor-plan-cell { min-width: 5.5rem; }
+.floor-plan-figure { margin: 1.2rem 0 0; }
+.floor-plan-figure figcaption { margin-top: 0.4rem; color: var(--color-muted); font-size: 0.76rem; }
+.listing-card__body { display: flex; align-items: flex-start; gap: 0.7rem; }
+.listing-card__text { display: grid; flex: 1; min-width: 0; gap: 0.35rem; }
+.compare-table .floor-plan--card { width: 160px; max-height: none; }

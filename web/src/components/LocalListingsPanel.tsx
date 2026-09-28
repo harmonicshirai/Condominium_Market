@@ -3,6 +3,7 @@ import type { ChangeKind, ListingChange } from '../lib/changes';
 import { countChanges } from '../lib/changes';
 import ChangeBadge, { CHANGE_TEXT, formatCheckedAt } from './ChangeBadge';
 import ListingCard from './ListingCard';
+import FloorPlanImage from './FloorPlanImage';
 import { paymentPlan } from '../lib/financing';
 import { NARROW_QUERY, useMediaQuery } from '../lib/useMediaQuery';
 import type { Confidence, Evaluation, LocalListing, Municipality, MyConditions } from '../types';
@@ -245,6 +246,7 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
               onToggleSave={() => onToggleStar(listing.id)}
               totalCostYen={plan?.totalCostYen ?? null}
               removed={listing.status === 'removed'}
+              floorPlanThumbUrl={listing.floorPlanThumbUrl}
               badges={changes.has(listing.id) || listing.status === 'removed' || listing.dupGroup ? <>
                 <ChangeBadge change={changes.get(listing.id)} />
                 {listing.status === 'removed' && !changes.has(listing.id) ? <span className="badge badge--removed">掲載終了</span> : null}
@@ -257,7 +259,7 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
         <div className="table-wrap">
           <table className="listing-table">
             <thead><tr>
-              <th aria-label="保存"></th><th>物件名</th><th>市区町村・駅</th>
+              <th aria-label="保存"></th><th>物件名</th><th>間取り</th><th>市区町村・駅</th>
               {header('price', '価格')}{header('ppsqm', '㎡単価')}{header('area', '面積')}{header('built', '築年')}{header('walk', '徒歩')}
               {header('gap', '相場比')}<th>判定</th>{header('days', '掲載日数')}<th>詳細</th>
             </tr></thead>
@@ -270,6 +272,7 @@ export default function LocalListingsPanel({ data, evaluations, evaluationsLoadi
                 <tr key={listing.id} onClick={() => onOpen(listing)} className={listing.status === 'removed' ? 'row--removed' : undefined}>
                   <td><button type="button" className="star-button" aria-pressed={isStarred} aria-label={isStarred ? '保存を外す' : '保存する'} title={isStarred ? '保存を外す' : '保存する（保存・比較タブに集まります）'} onClick={(event) => { event.stopPropagation(); onToggleStar(listing.id); }}>{isStarred ? '★' : '☆'}</button></td>
                   <td><a href={listing.sourceUrl} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()}>{listing.name || '名称なし'}</a>{listing.status === 'removed' ? <><br /><small>掲載終了</small></> : null}{listing.dupGroup ? <><br /><small>重複候補あり</small></> : null}{changes.has(listing.id) ? <div className="row-badges"><ChangeBadge change={changes.get(listing.id)} /></div> : null}</td>
+                  <td className="floor-plan-cell"><FloorPlanImage url={listing.floorPlanThumbUrl} size="thumb" /><small>{listing.floorPlan || '—'}</small></td>
                   <td>{municipalityName(listing.municipalityCode)}<br /><small>{listing.station || '駅不明'}</small></td>
                   <td>{formatManYen(price)}</td>
                   <td>{formatPpsqm(price / listing.areaSqm)}</td>

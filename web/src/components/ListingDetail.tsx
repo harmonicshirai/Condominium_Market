@@ -12,6 +12,7 @@ import { listingRegionChange } from '../lib/regionIndex';
 import ComparableCharts from './ComparableCharts';
 import ComparableTable from './ComparableTable';
 import PaymentCard from './PaymentCard';
+import FloorPlanImage from './FloorPlanImage';
 import PriceHistory from './PriceHistory';
 
 const valuationConfig = valuationJson as ValuationConfig;
@@ -42,6 +43,8 @@ interface ListingDetailProps {
   timeAdjust?: (tx: Transaction) => number | null;
   regionIndex?: RegionIndex | null;
   trendBasePos?: number;
+  /** 間取り図（手元データの物件で、URL を取得済みのとき） */
+  floorPlan?: { url: string; largeUrl: string | null } | null;
 }
 
 function yenMonthly(listing: Listing): string {
@@ -49,7 +52,7 @@ function yenMonthly(listing: Listing): string {
   return `${(listing.managementFeeYen + listing.repairReserveYen).toLocaleString('ja-JP')}円/月`;
 }
 
-export default function ListingDetail({ listing, municipalities, priceIndex, meta, conditions, onBack, onEdit, onUpdate, landRights, backLabel = '← 物件一覧へ', actions, notes, allowHazard = true, timeAdjust, regionIndex, trendBasePos }: ListingDetailProps) {
+export default function ListingDetail({ listing, municipalities, priceIndex, meta, conditions, onBack, onEdit, onUpdate, landRights, backLabel = '← 物件一覧へ', actions, notes, allowHazard = true, timeAdjust, regionIndex, trendBasePos, floorPlan }: ListingDetailProps) {
   const { evaluation, transactions, loading, error } = useEvaluation({
     listing,
     municipalities,
@@ -101,6 +104,12 @@ export default function ListingDetail({ listing, municipalities, priceIndex, met
             <div><dt>リフォーム</dt><dd>{listing.renovation.status === 'renovated' ? `実施済み${listing.renovation.year ? `（${listing.renovation.year}年）` : ''}` : listing.renovation.status === 'not_renovated' ? '未改装' : '不明'}{listing.renovation.scope ? `・${listing.renovation.scope}` : ''}{listing.renovation.evidence ? `・根拠: ${listing.renovation.evidence}` : ''}</dd></div>
             <div><dt>掲載ページ</dt><dd>{listing.sourceUrl ? <a href={listing.sourceUrl} target="_blank" rel="noopener noreferrer">別タブで開く</a> : '未登録'}</dd></div>
           </dl>
+          {floorPlan ? (
+            <figure className="floor-plan-figure">
+              <FloorPlanImage url={floorPlan.largeUrl ?? floorPlan.url} largeUrl={floorPlan.largeUrl} size="large" />
+              <figcaption>間取り図（掲載ページの画像を、見るときに読み込んで表示しています。押すと大きく開きます）</figcaption>
+            </figure>
+          ) : null}
           {listing.memo ? <p className="detail-memo">メモ: {listing.memo}</p> : null}
           {notes}
         </section>

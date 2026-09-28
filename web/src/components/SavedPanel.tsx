@@ -57,6 +57,8 @@ export default function SavedPanel({ items, missing, compareIds, conditions, mun
               onOpen={() => onOpen(item)}
               totalCostYen={plan?.totalCostYen ?? null}
               removed={item.local?.status === 'removed'}
+              floorPlanThumbUrl={item.local?.floorPlanThumbUrl}
+              floorPlanImageUrl={item.local?.floorPlanImageUrl}
               badges={<>{item.kind === 'mine' ? <span className="badge">自分で登録</span> : null}{item.local?.status === 'removed' ? <span className="badge badge--removed">掲載終了</span> : null}{badgesFor?.(item)}</>}
               footer={<>
                 <label className="check-inline"><input type="checkbox" checked={inCompare} disabled={!inCompare && full} onChange={() => onToggleCompare(item.listing.id)} />比較する</label>

@@ -348,6 +348,7 @@ export default function App() {
             onBack={backFromDetail}
             backLabel={returnTab ? BACK_LABELS[returnTab] : '← 掲載物件の一覧へ'}
             landRights={activeLocal.landRights}
+            floorPlan={activeLocal.floorPlanThumbUrl ? { url: activeLocal.floorPlanThumbUrl, largeUrl: activeLocal.floorPlanImageUrl ?? null } : null}
             allowHazard={activeLocal.locationPrecision === 'exact'}
             timeAdjust={timeAdjust}
             regionIndex={regionIndex}

@@ -7,6 +7,7 @@ import { bestIndexes, type SavedItem } from '../lib/saved';
 import { listingSeismic } from '../lib/valuation';
 import { formatYen } from './FinancingSummary';
 import { BUDGET_FIT_TEXT } from './PaymentCard';
+import FloorPlanImage from './FloorPlanImage';
 
 interface CompareTableProps {
   items: SavedItem[];
@@ -38,6 +39,12 @@ export default function CompareTable({ items, conditions, municipalities, today,
   }));
   const showLoan = conditions.financing.showLoan;
   const rows: Row[] = [
+    ...(items.some((item) => item.local?.floorPlanThumbUrl) ? [{
+      label: '間取り図',
+      cell: (item: SavedItem) => item.local?.floorPlanThumbUrl
+        ? <FloorPlanImage url={item.local.floorPlanThumbUrl} largeUrl={item.local.floorPlanImageUrl} size="card" />
+        : <small>{item.kind === 'local' ? '未取得' : dash}</small>,
+    }] : []),
     {
       label: '売出価格', value: price, best: 'min',
       cell: (item) => {
